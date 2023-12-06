@@ -73,7 +73,6 @@ Deno.test("Day 3: Gear Ratios - Part 1 - sample", () => {
 });
 
 Deno.test("Day 3: Gear Ratios - Part 1 - input", () => {
-  console.log(part1(getInput()));
   assertEquals(part1(getInput()), 539637);
 });
 
@@ -130,7 +129,6 @@ Deno.test("Day 3: Gear Ratios - Part 2 - sample", () => {
 });
 
 Deno.test("Day 3: Gear Ratios - Part 2 - input", () => {
-  console.log(part2(getInput()));
   assertEquals(part2(getInput()), 82818007);
 });
 
