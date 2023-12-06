@@ -1,6 +1,10 @@
 import { assertEquals } from "https://deno.land/std@0.208.0/assert/assert_equals.ts";
 
-function main(input: string) {
+////////////
+// Part 1 //
+////////////
+
+function part1(input: string) {
   return input
     .split("\n")
     .map((line) => line.replaceAll(/[^\d]/g, ""))
@@ -9,17 +13,86 @@ function main(input: string) {
 }
 
 Deno.test("Day 1: Trebuchet?! - Part 1 - sample", () => {
-  const example = `1abc2
-  pqr3stu8vwx
-  a1b2c3d4e5f
-  treb7uchet`;
-
-  assertEquals(main(example), 142);
+  assertEquals(part1(getPart1Sample()), 142);
 });
 
 Deno.test("Day 1: Trebuchet?! - Part 1 - input", () => {
-  console.log(main(getInput()));
+  console.log(part1(getInput()));
+  assertEquals(part1(getInput()), 54159);
 });
+
+////////////
+// Part 2 //
+////////////
+
+function part2(input: string) {
+  const words = [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+  ] as const;
+  type Word = typeof words[number];
+  const digits = [...Array(10).keys()].map((a) => String(a));
+  const pattern = `(?=(${words.join("|")}|${digits.join("|")}))`;
+
+  const isWord = (subject: any): subject is Word => words.includes(subject);
+  const wordToDigit = (word: Word) => String(words.indexOf(word) + 1);
+  const getDigit = (match: RegExpMatchArray | undefined): string => {
+    if (!match) {
+      throw new Error("No match");
+    }
+    return isWord(match[1]) ? wordToDigit(match[1]) : match[1];
+  };
+
+  return input
+    .split("\n")
+    .map((line) => [...line.matchAll(new RegExp(pattern, "g"))])
+    .map((subject) =>
+      Number(getDigit(subject.at(0)) + getDigit(subject.at(-1)))
+    )
+    .reduce((a, b) => a + b);
+}
+
+Deno.test("Day 1: Trebuchet?! - Part 2 - sample", () => {
+  assertEquals(part2(getPart2Sample()), 281);
+});
+
+Deno.test("Day 1: Trebuchet?! - Part 2 - corner case", () => {
+  assertEquals(part2("eighthree"), 83);
+  assertEquals(part2("sevenine"), 79);
+});
+
+Deno.test("Day 1: Trebuchet?! - Part 2 - input", () => {
+  console.log(part2(getInput()));
+  assertEquals(part2(getInput()), 53866);
+});
+
+//////////
+// Data //
+//////////
+
+function getPart1Sample() {
+  return `1abc2
+    pqr3stu8vwx
+    a1b2c3d4e5f
+    treb7uchet`;
+}
+
+function getPart2Sample() {
+  return `two1nine
+    eightwothree
+    abcone2threexyz
+    xtwone3four
+    4nineeightseven2
+    zoneight234
+    7pqrstsixteen`;
+}
 
 function getInput() {
   return `eightqrssm9httwogqshfxninepnfrppfzhsc

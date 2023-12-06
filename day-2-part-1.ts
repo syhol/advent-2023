@@ -1,8 +1,12 @@
 import { assertEquals } from "https://deno.land/std@0.208.0/assert/assert_equals.ts";
 
+////////////
+// Part 1 //
+////////////
+
 type Game = { game: number; cubes: Record<string, number> };
 
-function main(input: string) {
+function part1(input: string) {
   return input
     .split("\n")
     .map(parseGame)
@@ -45,18 +49,57 @@ function parseCubes(cubeString: string): Record<string, number> {
 }
 
 Deno.test("Day 2: Cube Conundrum - Part 1 - sample", () => {
+  assertEquals(part1(getSample()), 8);
+});
+
+Deno.test("Day 2: Cube Conundrum - Part 1 - input", () => {
+  console.log(part1(getInput()));
+  assertEquals(part1(getInput()), 2256);
+});
+
+////////////
+// Part 2 //
+////////////
+
+function part2(input: string) {
+  return input
+    .split("\n")
+    .map(parseGame)
+    .map(generatePower)
+    .reduce((count, power) => count + power, 0);
+}
+
+function generatePower(game: Game): number {
+  return Object.values(game.cubes)
+    .reduce((power, cubes) => power * cubes, 1);
+}
+
+Deno.test("Day 2: Cube Conundrum - Part 2 - sample", () => {
   const example = `Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green`;
 
-  assertEquals(main(example), 8);
+  assertEquals(part2(example), 2286);
 });
 
-Deno.test("Day 2: Cube Conundrum - Part 1 - input", () => {
-  console.log(main(getInput()));
+Deno.test("Day 2: Cube Conundrum - Part 2 - input", () => {
+  console.log(part2(getInput()));
+  assertEquals(part2(getInput()), 74229);
 });
+
+//////////
+// Data //
+//////////
+
+function getSample() {
+  return `Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green`;
+}
 
 function getInput() {
   return `Game 1: 14 green, 8 blue, 9 red; 5 blue, 4 green, 2 red; 4 red, 4 blue, 4 green; 1 blue, 3 green, 2 red; 10 red, 3 blue, 15 green; 2 red, 6 green, 3 blue

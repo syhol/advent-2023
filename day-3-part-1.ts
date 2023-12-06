@@ -1,9 +1,13 @@
 import { assertEquals } from "https://deno.land/std@0.208.0/assert/assert_equals.ts";
 
+////////////
+// Part 1 //
+////////////
+
 type Point = { row: number; column: number; value: string };
 type Part = { number: number; points: Point[] };
 
-function main(input: string) {
+function part1(input: string) {
   const cells = parseCells(input);
   const digits = [...traverse(cells)].filter(isDigit);
   const parts = [...groupParts(digits)].filter(isPartNumber(cells));
@@ -65,7 +69,77 @@ function isSymbol(value: string | undefined): boolean {
 }
 
 Deno.test("Day 3: Gear Ratios - Part 1 - sample", () => {
-  const example = `467..114..
+  assertEquals(part1(getSample()), 4361);
+});
+
+Deno.test("Day 3: Gear Ratios - Part 1 - input", () => {
+  console.log(part1(getInput()));
+  assertEquals(part1(getInput()), 539637);
+});
+
+////////////
+// Part 2 //
+////////////
+
+function part2(input: string) {
+  const cells = parseCells(input);
+  const points = [...traverse(cells)];
+  const digits = points.filter(isDigit);
+  const gears = points.filter(isGear);
+  const parts = [...groupParts(digits)];
+  const gearRatios = [...generateGearRatios(gears, parts)];
+  return gearRatios.reduce((total, gearRatio) => total + gearRatio, 0);
+}
+
+function isGear({ value }: Point): boolean {
+  return /[\*]/.test(value ?? "");
+}
+function* generateGearRatios(gears: Point[], parts: Part[]) {
+  for (const gear of gears) {
+    const gearParts = [];
+    for (const part of parts) {
+      if (isPartAttachedToGear(gear, part)) {
+        gearParts.push(part);
+      }
+    }
+    if (gearParts.length === 2) {
+      yield (gearParts[0].number * gearParts[1].number);
+    }
+  }
+}
+function isPartAttachedToGear(gear: Point, part: Part) {
+  for (const point of part.points) {
+    const isGearPart =
+      gear.row === point.row - 1 && gear.column === point.column - 1 ||
+      gear.row === point.row - 1 && gear.column === point.column ||
+      gear.row === point.row - 1 && gear.column === point.column + 1 ||
+      gear.row === point.row && gear.column === point.column - 1 ||
+      gear.row === point.row && gear.column === point.column + 1 ||
+      gear.row === point.row + 1 && gear.column === point.column - 1 ||
+      gear.row === point.row + 1 && gear.column === point.column ||
+      gear.row === point.row + 1 && gear.column === point.column + 1;
+    if (isGearPart) {
+      return true;
+    }
+  }
+  return false;
+}
+
+Deno.test("Day 3: Gear Ratios - Part 2 - sample", () => {
+  assertEquals(part2(getSample()), 467835);
+});
+
+Deno.test("Day 3: Gear Ratios - Part 2 - input", () => {
+  console.log(part2(getInput()));
+  assertEquals(part2(getInput()), 82818007);
+});
+
+//////////
+// Data //
+//////////
+
+function getSample() {
+  return `467..114..
 ...*......
 ..35..633.
 ......#...
@@ -75,13 +149,7 @@ Deno.test("Day 3: Gear Ratios - Part 1 - sample", () => {
 ......755.
 ...$.*....
 .664.598..`;
-
-  assertEquals(main(example), 4361);
-});
-
-Deno.test("Day 3: Gear Ratios - Part 1 - input", () => {
-  console.log(main(getInput()));
-});
+}
 
 function getInput() {
   return `...............776..............552........968..................589...26...........484..............958......186....546.........484.........
